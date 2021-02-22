@@ -3,6 +3,10 @@ title: About Hugo Prose
 author: Yihui Xie
 categories: [Hugo, Theme]
 tags: [menu, TOC, sidenote, appendix, citation, numbered section]
+menu:
+  header:
+    name: About
+    weight: 2
 appendix:
   acknowledgments: |
     We thank the authors of the [Wowchemy](https://wowchemy.com) theme, [tufte.css](https://github.com/edwardtufte/tufte.css), and the
@@ -17,7 +21,10 @@ appendix:
     distill?"
     
     The images on this page are from Wikipedia entries [Stoicism](https://en.wikipedia.org/wiki/Stoicism)
-    and [清明上河图](https://zh.wikipedia.org/wiki/%E6%B8%85%E6%98%8E%E4%B8%8A%E6%B2%B3%E5%9C%96).
+    and [清明上河图](https://zh.wikipedia.org/wiki/%E6%B8%85%E6%98%8E%E4%B8%8A%E6%B2%B3%E5%9C%96). The
+    CSS style for draft posts was borrowed from Fabian Tamp's
+    [paperesque](https://github.com/capnfabs/paperesque/) theme. [Wladimir Palant's tutorial](https://palant.info/2020/06/04/the-easier-way-to-use-lunr-search-with-hugo/)
+    helped a lot with our implementation of the client-side search.
 features: [+toc, +number_sections, +sidenotes, -citation]
 ---
 
@@ -43,38 +50,12 @@ not use any CSS frameworks, and the full CSS code is also written from scratch
 
 </div>
 
-As Stoicism preaches, moderation is key, function is more important than form,
-and we should not live in excess. Stoicism does not advocate sacrifices. You
-just need to be content with "enough." The natural question to ask is, how much
-is enough? Of course, different people will have different answers. Is a
-professional headshot on our homepage necessary?[^2] Is a huge banner image at
-the top of each post necessary?[^3] Is the contact form necessary?[^4] Is
-"mobile friendly" necessary?[^5] Are these footnotes necessary?[^6] The answers
-are not necessarily "No," but you may want to spend some quality time on
-reflecting the pain and gain of each element on your website, and whether you
-use them because you need them or just happen to have them.
-
-[^2]: Is our picture more important than our contribution to the world?
-
-[^3]: Especially when these banner images are only loosely relevant to the
-    posts.
-
-[^4]: How many of our readers do not know how to send emails?
-
-[^5]: Aren't we addicted enough to our mobile devices?
-
-[^6]: Why cannot we write so clearly and smoothly that readers do not have to
-    stop from time to time to look at our side thoughts?
-
 This page introduces the features of this Hugo theme that you can fiddle with.
-I'm not sure when you will be bored by this theme, but I think from the moment
-when you first see this theme, the clock has started ticking, just like the
-ever-decreasing joy of online shopping after you hit the checkout button.
 
 ## Site configurations
 
-As a minimalist theme, its configurations are relatively simple. For now, you
-can configure the following elements.
+Below are the possible options that you may configure for a site based on this
+theme.
 
 ### Menus
 
@@ -98,17 +79,34 @@ menu:
     - name: Categories
       url: "/categories/"
       weight: 2
-      identifier: "categories"
+      pre: "optional"
 ```
 
 The `url` of a menu item can be either a relative URL pointing to a page on this
 website, or an external link (e.g., `url: "https://github.com/yihui"`). The
 order of the menu items is determined by the `weight` values. If a menu item has
-an `identifier`, it indicates that this menu item will be hidden on small
-screens.[^7]
+a `pre` value, it will be used as the class of the menu item. The special value
+`optional` indicates that this menu item will be hidden on small screens.[^2]
 
-[^7]: These may be the unimportant items that you do not mind hiding on smaller
-    screens.
+[^2]: For example, `pre: "optional"` will generate the menu item
+    `<li class="optional">`. It may be an unimportant item that you do not mind
+    hiding on smaller screens.
+
+The header menu can be made sticky via the parameter `pageFeatures` in
+`config.yaml`:
+
+``` yaml
+params:
+  pageFeatuers: [+sticky_menu]
+```
+
+This feature can be disabled per-page if enabled globally in
+`config.yaml`----add `-sticky_menu` to the `features` YAML field in the single
+page, e.g.,
+
+``` yaml
+features: [-sticky_menu]
+```
 
 ### Home page
 
@@ -120,7 +118,7 @@ info cards, and then a number of the latest posts and pages.
 
 -   The info cards come from the `content/card/` directory. Each (Markdown) file
     is displayed on the home page as a separate card. The title is displayed
-    vertically on the left or right side.[^8] If you want to customize the style
+    vertically on the left or right side.[^3] If you want to customize the style
     of a certain card, you may use the YAML option `style` in the file, e.g.,
 
     ``` yaml
@@ -142,9 +140,17 @@ info cards, and then a number of the latest posts and pages.
       homePosts: 10
     ```
 
-    The default is 5.
+    The default is 6.
 
-[^8]: We recommend that you keep the title short so it can fit on one line.
+-   The `mainSections` parameter can be used to select the sections of pages to
+    be included on the home page, e.g.,
+
+    ``` yaml
+    params:
+      mainSections: ["post", "news"]
+    ```
+
+[^3]: We recommend that you keep the title short so it can fit on one line.
 
 ### Footer
 
@@ -155,6 +161,62 @@ Besides the menu in the footer, you can specify a copyright statement in the
 params:
   footer: "&copy; Frida Gomam 2015 -- 2020"
 ```
+
+### Comments
+
+Disqus, Utterances
+
+### Searching
+
+This theme supports searching out of the box based on
+[Fuse.js](https://fusejs.io). A few critical configurations:
+
+-   The site needs to generate a JSON index. This is done via a layout file
+    `index.json.json` in `layouts/_default/`, and the config in `config.yaml`:
+
+    ``` yaml
+    outputs:
+      home: [html, rss, json]
+    ```
+
+-   A menu item with the ID `menu-search` configured in `config.yaml`, e.g.,
+
+    ``` yaml
+    menu:
+      header:
+        - name: Search
+          url: "#"
+          identifier: menu-search
+    ```
+
+-   The version of Fuse can be configured via the parameter `fuseVersion` in
+    `config.yaml`, e.g.,
+
+    ``` yaml
+    params:
+      fuseVersion: 6.4.3
+    ```
+
+    If no `fuseVersion` is specified, the latest version of Fuse.js will be
+    used. You may also download a copy of Fuse.js to the `static/` folder of
+    your site and use this copy instead of loading it from CDN. To do that, you
+    may download Fuse.js to, say, `static/js/fuse.js` and modify the partial
+    template `layouts/partials/foot_custom.html`. Replace
+
+    ``` html
+    {{ with .Site.Params.fuseVersion }}
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@{{ . }}"></script>
+    {{ end }}
+    ```
+
+    with
+
+    ``` html
+    <script src="{{ relURL "/js/fuse.js" }}"></script>
+    ```
+
+    That way, you can also use search when viewing the site offline, because
+    Fuse.js is no longer loaded from CDN.
 
 ## Articles
 
@@ -178,10 +240,16 @@ Pandoc/R Markdown.
 Section headers can be automatically numbered, no matter if you use
 Hugo/goldmark or Pandoc/R Markdown.
 
-### Footnotes and sidenotes
+### Footnotes, citations, and sidenotes
 
-Footnotes are moved to the right margin by default. If you want to write
-arbitrary sidenotes, use the classes `side` and `side-left`/`side-right`.
+Footnotes and citation entries[^4] are moved to the right margin by default. If
+you want to write arbitrary sidenotes, use the classes `side` and
+`side-left`/`side-right`.
+
+[^4]: Note that if you want to use citations, you have [the R Markdown
+    format](https://bookdown.org/yihui/blogdown/output-format.html) with the R
+    package **blogdown**. Plain Markdown posts (`.md` files) do not support
+    citations.
 
 <div class="side side-left">
 
@@ -211,9 +279,11 @@ Content to be displayed as a sidenote.
 
 -   Suggest changes
 
--   Citation
+### Drafts
 
-### References
+Mark an article as draft by adding `draft: true` to the YAML metadata. Draft
+articles are styled with a background of diagonal lines and a watermark "Draft."
+For listing pages, draft articles are also indicated by the background.
 
 ## Floats
 
@@ -255,8 +325,8 @@ Super wide content to be scrolled horizontally.
 ### Embedded elements
 
 Use the `embed-left` or `embed-right` class to embed a content block to be
-floated to the left or right, and the block will exceed the article margin,
-e.g.,
+floated to the left or right, and the block will exceed the article margin by
+200px, e.g.,
 
 ``` html
 <div class="embed-right">
@@ -275,9 +345,9 @@ narrative. For example, you can embed a video on the right side, and provide a
 narrative in the body of the article, which will be on the left side of the
 video.
 
-By default, the width of the embedded element is 600px, out of which 200px will
-be in the margin, meaning that there will be 400px left for the narrative in the
-article body.
+By default, the `max-width` of the embedded element is 600px (the actual width
+could be smaller), out of which 200px will be in the margin, meaning that there
+will be at least 400px left for the narrative in the article body.
 
 When the screen width is smaller than 1200px, the embedded elements will be
 floated back into the article as normal block-level elements.
@@ -315,7 +385,13 @@ block-level elements when the screen width is smaller than 800px.
 
 The first alphabetical character in each summary block is converted to an [open
 face character](https://www.w3.org/TR/xml-entity-names/double-struck.html) such
-as 𝔸𝔹ℂ𝔻.
+as:
+
+<div style="font-size: 3em; line-height: 1em;">
+
+> &Aopf; &Bopf; &Copf; &Dopf; &Eopf; &Fopf; &Gopf; &Hopf; &Iopf; &Jopf; &Kopf; &Lopf; &Mopf; &Nopf; &Oopf; &Popf; &Qopf; &Ropf; &Sopf; &Topf; &Uopf; &Vopf; &Wopf; &Xopf; &Yopf; &Zopf; &aopf; &bopf; &copf; &dopf; &eopf; &fopf; &gopf; &hopf; &iopf; &jopf; &kopf; &lopf; &mopf; &nopf; &oopf; &popf; &qopf; &ropf; &sopf; &topf; &uopf; &vopf; &wopf; &xopf; &yopf; &zopf;
+
+</div>
 
 ### Navigation links
 
@@ -323,11 +399,13 @@ as 𝔸𝔹ℂ𝔻.
 
 ### Screen size
 
-|                   | \< 650px | 650 - 800px | 800 - 1280px | \> 1280px |
-|-------------------|----------|-------------|--------------|-----------|
-| Menu              |          |             |              |           |
-| Table of contents |          |             |              |           |
-| Floats            |          |             |              |           |
+|                   | Attribute \\ width | 650 - 800px | 800 - 1280px  | \> 1280px                  |
+|-------------------|--------------------|-------------|---------------|----------------------------|
+| Menu              | optional items     | hidden      | shown         | \<=                        |
+| Table of contents | position           | =\>         | body / static | left margin / sticky       |
+| Floats            | position           | =\>         | body / static | beside or overlapping body |
+| Sidenotes         | position           | =\>         | body / static | side                       |
+| Home posts        | layout             | one column  | two columns   | \<=                        |
 
 ### Dark theme
 
@@ -341,5 +419,4 @@ the dark mode.
 
 ## TODO
 
-Currently only `.md` files are tested. The full support for `.Rmd` and
-`.Rmarkdown` will come soon.
+section anchors

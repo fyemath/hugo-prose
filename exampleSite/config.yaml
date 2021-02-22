@@ -11,17 +11,15 @@ paginate: 2
 permalinks:
   post: "/post/:year/:month/:day/:slug/"
 
+outputs:
+  home: [html, rss, json]
+
+# some menu items were added via the `menu` option in YAML in posts
 menu:
   header:
-    - name: Home
-      url: "/"
-      weight: 1
-    - name: About
-      url: "/about/"
-      weight: 2
-    - name: Sitemap
-      url: "/sitemap/"
-      weight: 3
+    - name: Search
+      url: "#"
+      identifier: menu-search
     - name: Subscribe
       url: "index.xml"
   footer:
@@ -31,17 +29,21 @@ menu:
     - name: Categories
       url: "/categories/"
       weight: 2
-      identifier: "categories"
+      pre: "optional"
     - name: Tags
       url: "/tags/"
       weight: 3
-      identifier: "tags"
-    - name: Subscribe
-      url: "index.xml"
-      identifier: "subscribe"
+      pre: "optional"
+    - name: Suggest an edit
+      url: "#"
+      weight: 4
+      identifier: "menu-edit"
+    - name: Back to top
+      url: "#"
 
 params:
-  homePosts: 5
+  homePosts: 6
+  mainSections: ["post", "work"]
   editLink: "https://github.com/yihui/hugo-prose/edit/master/exampleSite/content/"
   authorDelimiter: " / "
   pageFeatures: [+sidenotes]
